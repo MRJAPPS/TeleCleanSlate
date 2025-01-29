@@ -5,6 +5,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Platforms>AnyCPU;x64;ARM64</Platforms>
+    <Configurations>Debug;Release;DebugARM;ReleaseARM</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +14,13 @@
     <Folder Include="Programs\" />
     <Folder Include="Telegram\Chat\" />
     <Folder Include="Telegram\Security\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="3.0.3" />
+    <PackageReference Include="Spectre.Console" Version="0.49.1" />
+    <PackageReference Include="TDLib" Version="1.8.29" />
+    <PackageReference Include="tdlib.native" Version="1.8.29" />
   </ItemGroup>
 
 </Project>
