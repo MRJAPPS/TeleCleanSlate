@@ -19,6 +19,14 @@ internal static class CommonConstants
     {
         public const int NotFound = 404;//LoadChats
     }
+
+    /// <summary>
+    /// Contains constants with special meaning in TdLib.
+    /// </summary>
+    internal static class TTdApi
+    {
+        public const long ShouldRemoveChat = 0;//UpdateChatPosition(Position.Order)
+    }
     #endregion
 
     #region DEFSETTINGS

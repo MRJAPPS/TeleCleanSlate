@@ -14,7 +14,7 @@ internal sealed class Settings : CommandSettings
     public required string ApiHash { get; set; }
     [Description("The API ID provided by Telegram for the application.(https://core.telegram.org/api/obtaining_api_id)")]
     [CommandArgument(1, $"<{nameof(ApiId)}>")]
-    public required string ApiId { get; set; }
+    public required int ApiId { get; set; }
     [Description("The file path where the tdlib database should be stored.")]
     [DefaultValue("PC")]
     [CommandOption("--devname")]
