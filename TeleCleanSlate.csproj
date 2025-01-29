@@ -7,4 +7,11 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Common\" />
+    <Folder Include="Programs\" />
+    <Folder Include="Telegram\Chat\" />
+    <Folder Include="Telegram\Security\" />
+  </ItemGroup>
+
 </Project>
