@@ -14,7 +14,12 @@ namespace TeleCleanSlate.Common
             Environment.Exit(3);
         }
 
-        public static void Helper_OnError(object _, TdException obj) => AnsiConsole.MarkupLine($"[red]{obj.Message}[/]");
+        public static void Helper_OnError(object _, TdException obj)
+        {
+            AnsiConsole.MarkupLine($"[red]{obj.Message}[/]");
+            if (obj.Message == nameof(CommonConstants.TdErrorCodes.API_ID_INVALID))
+                Environment.Exit(3);
+        }
 
         public static string Helper_OnNeedFirstName(object _) => AnsiConsole.Prompt(new TextPrompt<string>("Enter the FirstName: "));
 
