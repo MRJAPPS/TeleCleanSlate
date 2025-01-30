@@ -20,11 +20,11 @@ internal sealed class Settings : CommandSettings
     [DefaultValue("PC")]
     [CommandOption("--devname")]
     public string DeviceName { get; set; } = "PC";
-    [Description("The code of the language used for the application (e.g., \"en\" for English).")]
+    [Description("The code of the language used for the application (e.g., [bold]\"en\"[/] for English).")]
     [DefaultValue("en")]
     [CommandOption("--lang")]
     public string LangCode { get; set; } = "en";
-    [Description("The telegram phone number that you want to kill it :(")]
+    [Description("The telegram phone number that you want to [red]kill[/] it :(")]
     [CommandOption("--phone")]
     [DefaultValue(null)]
     public string? Tell { get; set; }

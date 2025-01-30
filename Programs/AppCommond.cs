@@ -34,14 +34,7 @@ namespace TeleCleanSlate.Programs
             helper.Wait();
             Panel panel = new Panel("By using the TeleCleanSlate tool, you acknowledge that you are solely responsible for your decision to delete your account and any consequences that may arise from it. The creator of this tool assumes no liability for any loss of data, account access, or unintended outcomes. Proceed only if you fully understand and accept this responsibility.").Header("[bold red rapidblink]Serious warning![/]");
             AnsiConsole.Write(panel);
-        Commitment:
-            string str = AnsiConsole.Prompt(new TextPrompt<string>("Please write 'I want to delete my account' to continue the deletion process: "));
-            if (!str.Equals("I want to delete my account", StringComparison.OrdinalIgnoreCase))
-            {
-                AnsiConsole.WriteLine(areuok[rand.Next(areuok.Length)]);
-                goto Commitment;
-            }
-
+            GetUserCommitment();
             try
             {
                 client.LogOutAsync().GetAwaiter().GetResult();
@@ -50,6 +43,18 @@ namespace TeleCleanSlate.Programs
             return 0;
         }
 
+        private static void GetUserCommitment()
+        {
+            while (true)
+            {
+                string response = AnsiConsole.Prompt(new TextPrompt<string>("Please write 'I want to delete my account' to continue the deletion process: "));
+                if (response.Equals("I want to delete my account", StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+                AnsiConsole.WriteLine(areuok[rand.Next(areuok.Length)]);
+            }
+        }
 
         private static string GetPhoneNumber(string? phoneNumber)
         {
