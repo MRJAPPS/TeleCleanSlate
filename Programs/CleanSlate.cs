@@ -87,6 +87,8 @@ internal class CleanSlate(TdClient client)
             try
             {
                 string pass = AnsiConsole.Prompt(new TextPrompt<string>("All chats and remaining traces of your account have been deleted as much as possible and cannot be recovered([green]Except Archive messages...![/]). If you wish to complete the account deletion process, please enter your password again:([red]!!YOU CAN CLOSE THE APP IF YOU WANT!![/]) ").Secret());
+                if (string.IsNullOrEmpty(pass.Trim())) 
+                    continue;
                 await client.DeleteAccountAsync("This account was deleted by me (the account's original owner) using the TeleCleanSlate tool!", pass);
                 break;
             }
