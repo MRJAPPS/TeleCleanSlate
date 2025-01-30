@@ -24,6 +24,6 @@ internal sealed class Settings : CommandSettings
     [CommandOption("--lang")]
     public string LangCode { get; set; } = "en";
     [Description("The telegram phone number that you want to kill it :(")]
-    [CommandOption("--lang")]
+    [CommandOption("--phone")]
     public string? Tell { get; set; }
 }
