@@ -35,6 +35,8 @@ namespace TeleCleanSlate.Programs
             Panel panel = new Panel("By using the TeleCleanSlate tool, you acknowledge that you are solely responsible for your decision to delete your account and any consequences that may arise from it. The creator of this tool assumes no liability for any loss of data, account access, or unintended outcomes. Proceed only if you fully understand and accept this responsibility.").Header("[bold red rapidblink]Serious warning![/]");
             AnsiConsole.Write(panel);
             GetUserCommitment();
+            CleanSlate cleanSlate = new(client);
+            cleanSlate.Run().GetAwaiter().GetResult();
             try
             {
                 client.LogOutAsync().GetAwaiter().GetResult();
