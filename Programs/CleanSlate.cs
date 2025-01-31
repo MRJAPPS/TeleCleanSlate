@@ -26,7 +26,7 @@ internal class CleanSlate(TdClient client)
         await AnsiConsole.Status().StartAsync("Loading chats...", async ctx => await Helper.LoadChatsAsync(client));
         long meId = (await client.GetMeAsync()).Id;
         var keys = CommonData.MainChatList.Keys.ToArray();
-
+        /*
         await AnsiConsole.Progress().StartAsync(async ctx =>
         {
             var prog = ctx.AddTask("Scaning and removing chats...", maxValue: keys.Length);
@@ -77,7 +77,7 @@ internal class CleanSlate(TdClient client)
                 {
                     log.Error(ex, ex);
                 }
-                prog.Value(i);
+                prog.Value(i + 1);
             }
         });
 #if !DEBUG
