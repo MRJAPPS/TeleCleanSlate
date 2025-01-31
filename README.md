@@ -1,4 +1,4 @@
-# TeleCleanSlate(⚠️!!!beta!!!!⚠️)
+# TeleCleanSlate(⚠️beta⚠️)
 
 **TeleCleanSlate** is a simple tool designed to assist users in **permanently deleting their Telegram accounts and all associated data**. Unlike the standard account deletion method provided by Telegram, which leaves messages and files accessible to other users, **TeleCleanSlate aims to remove as many traces as possible**. With its command-line interface and comprehensive automation, TeleCleanSlate offers a secure and thorough method for managing the deletion process.
 
