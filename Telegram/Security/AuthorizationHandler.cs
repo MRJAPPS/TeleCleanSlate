@@ -357,7 +357,7 @@ internal class AuthorizationHandler : IDisposable
         this.client = client;
         this.dbLocation = dbLocation;
         this.appVersion = appVersion;
-        this.data = string.IsNullOrEmpty(data?.Trim()) ? CommonConstants.DefInvalidPhoneNumber : data;
+        this.data = data;
         this.apiHash = apiHash;
         this.apiId = apiId;
         this.deviceName = deviceName;

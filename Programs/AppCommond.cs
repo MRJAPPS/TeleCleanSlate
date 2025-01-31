@@ -21,7 +21,9 @@ namespace TeleCleanSlate.Programs
         {
             client = new();
             client.Bindings.SetLogVerbosityLevel(TdLogLevel.Fatal);
-            AuthorizationHandler helper = helper = new(client, settings.DbName, appVersion, settings.Tell, settings.ApiHash, settings.ApiId, settings.DeviceName, settings.LangCode
+            AuthorizationHandler helper = helper = new(client, settings.DbName, appVersion,
+                string.IsNullOrEmpty(settings.Tell?.Trim()) ? CommonConstants.DefInvalidPhoneNumber : settings.Tell,
+                settings.ApiHash, settings.ApiId, settings.DeviceName, settings.LangCode
            , Helper_OnNeedCode, Helper_OnNeedPassword, Helper_OnNeedPhoneNumber, Helper_OnUnknownError, Helper_OnError);
             client.UpdateReceived += CommonUpdateHandlerMethods.UpdateChatListHanlder;
             client.UpdateReceived += CommonUpdateHandlerMethods.UpdateFoldersHandler;
