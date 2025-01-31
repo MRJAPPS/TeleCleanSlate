@@ -32,10 +32,11 @@ namespace TeleCleanSlate.Programs
             AnsiConsole.Write(panel);
             GetUserCommitment();
             CleanSlate cleanSlate = new(client);
-            cleanSlate.Run().GetAwaiter().GetResult();
+            cleanSlate.Run(!settings.SuperGroup, !settings.BasicGroup, !settings.BotUser, !settings.Chanel, !settings.RegularUser).GetAwaiter().GetResult();
             try
             {
-                client.LogOutAsync().GetAwaiter().GetResult();
+                if (!settings.KeepSession)
+                    client.LogOutAsync().GetAwaiter().GetResult();
             }
             catch { }
             return 0;

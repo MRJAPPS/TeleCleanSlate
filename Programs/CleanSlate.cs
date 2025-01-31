@@ -16,12 +16,29 @@ internal class CleanSlate(TdClient client)
     #region ELOG
     private static readonly ILog log = LogManager.GetLogger(typeof(CleanSlate));
     #endregion
+
+    #region METHODS
+    #region PRIVATE
+    /// <summary>
+    /// Evaluates a condition for a specific chat based on the provided flag.
+    /// If the flag is true, it checks whether the chat meets the specified condition.
+    /// </summary>
+    /// <param name="X">Flag indicating whether to apply the condition check.</param>
+    /// <param name="chatId">The ID of the chat to be evaluated.</param>
+    /// <param name="isXchat">A function that determines if the chat meets the condition.</param>
+    /// <returns>
+    /// Returning true if the condition is met
+    /// when the flag is true; otherwise, false.
+    /// </returns>
+    private async Task<bool> CheckChatCond(bool X, long chatId, Func<TdClient, long, Task<bool>> isXchat) => X && await isXchat(client, chatId);
+    #endregion
+    #region PUBLIC
     /// <summary>
     /// Executes the cleaning process, which involves loading chats, identifying messages that can be deleted or edited, and leaving non-essential chats.
+    /// and maybe deleting you're the account...!
     /// </summary>
-    /// <param name="inputs">Optional input parameters for the program (currently not used).</param>
     /// <returns>A task that represents the asynchronous clean-up operation.</returns>
-    public async Task Run()
+    public async Task Run(bool superGroup = true, bool basicGroup = true, bool botUser = true, bool chanel = true, bool regularUser = true, bool justClean = true)
     {
         await AnsiConsole.Status().StartAsync("Loading chats...", async ctx => await Helper.LoadChatsAsync(client));
         long meId = (await client.GetMeAsync()).Id;
@@ -37,7 +54,12 @@ internal class CleanSlate(TdClient client)
             for (int i = 0; i < keys.Length; i++)
             {
                 long chatId = keys[i];
-                if (chatId == meId) continue;
+                if (chatId == meId ||
+                !await CheckChatCond(superGroup, chatId, ChatListGetter.IsSuperGroup) ||
+                !await CheckChatCond(basicGroup, chatId, ChatListGetter.IsBasicGroup) ||
+                !await CheckChatCond(botUser, chatId, ChatListGetter.IsBotUser) ||
+                !await CheckChatCond(chanel, chatId, ChatListGetter.IsChanel) ||
+                !await CheckChatCond(regularUser, chatId, ChatListGetter.IsRegularUser)) continue;
                 try
                 {
                     if (!await ChatListGetter.IsChanel(client, chatId))
@@ -84,26 +106,46 @@ internal class CleanSlate(TdClient client)
                 prog.Value(i + 1);
             }
         });
-#if !DEBUG
-        while (true)
+        if (!justClean)
         {
-            try
+#if true//DEBUG
+            while (true)
             {
-                string pass = AnsiConsole.Prompt(new TextPrompt<string>("All chats and remaining traces of your account have been deleted as much as possible and cannot be recovered([green]Except Archive messages...![/]). If you wish to complete the account deletion process, please enter your password again:([red]!!YOU CAN CLOSE THE APP IF YOU WANT!![/]) ").Secret());
-                if (string.IsNullOrEmpty(pass.Trim())) 
-                    continue;
-                await client.DeleteAccountAsync("This account was deleted by me (the account's original owner) using the TeleCleanSlate tool!", pass);
-                break;
+                try
+                {
+                    bool deleteByPassword = AnsiConsole.Prompt(new TextPrompt<bool>("All chats and remaining traces of your account have been deleted as much as possible and cannot be recovered([green]Except Archive messages...![/]).\r\nYou have the option to enter your Telegram password now to delete your account.\r\nIf you choose NOT to enter your password, your account deletion request will be submitted through the standard Telegram process.\r\nThis process takes 7 days, during which you have the option to cancel the deletion through Telegram itself.\r\n\r\nDo you want to enter your password? (if u don't have a password, enter \'n\'){[red]!!YOU CAN CLOSE THE APP IF YOU WANT!![/]} (y/n)")
+                        .AddChoice(true)
+                        .AddChoice(false)
+                        .DefaultValue(true)
+                        .WithConverter(choice => choice ? "y" : "n"));
+                    string pass = "";
+                    if (deleteByPassword)
+                    {
+                        pass = AnsiConsole.Prompt(new TextPrompt<string>("If you wish to complete the account deletion process, please enter your password:([red]!!YOU CAN CLOSE THE APP IF YOU WANT!![/]) ").Secret());
+                        if (string.IsNullOrEmpty(pass.Trim()))
+                            continue;
+                    }
+                    await client.DeleteAccountAsync("This account was deleted by me (the account's original owner) using the TeleCleanSlate tool!", pass);
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    AnsiConsole.MarkupLine($"[red]{ex.Message}(try again...)[/]");
+                }
             }
-            catch (Exception ex)
-            {
-                AnsiConsole.MarkupLine($"[red]{ex.Message}(try again...)[/]");
-            }
-        }
+            Panel infoPanel = new Panel("Apparently, your account has been deleted. We're sorry you made this decision, and we hope it wasn't to erase evidence of a crime! ([green]If it hasn't been deleted, you can use the standard method.[/])").Header("[green bold rapidblink]INFO[/]");
+            AnsiConsole.Write(infoPanel);
 #endif
-        Panel infoPanel = new Panel("Apparently, your account has been deleted. We're sorry you made this decision, and we hope it wasn't to erase evidence of a crime! ([green]If it hasn't been deleted, you can use the standard method.[/])").Header("[green bold rapidblink]INFO[/]");
-        AnsiConsole.Write(infoPanel);
+        }
+        else
+        {
+            Panel infoPanel = new Panel("Apparently, your account has been deleted. We're sorry you made this decision, and we hope it wasn't to erase evidence of a crime! ([green]If it hasn't been deleted, you can use the standard method.[/])").Header("[green bold rapidblink]INFO[/]");
+            AnsiConsole.Write(infoPanel);
+        }
         AnsiConsole.WriteLine("Bye!");
     }
+    #endregion
+    #endregion
+
 }
 
