@@ -9,6 +9,18 @@
     <Configurations>Debug;Release;DebugARM;ReleaseARM</Configurations>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseARM|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseARM|x64'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseARM|ARM64'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="log4net" Version="3.0.3" />
     <PackageReference Include="Spectre.Console" Version="0.49.1" />
