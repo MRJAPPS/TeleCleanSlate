@@ -18,7 +18,8 @@ internal static class CommonConstants
     internal static class TdErrorCodes
     {
         public const int NotFound = 404;//LoadChats
-        public const int API_ID_INVALID = 400;//LoadChats
+        public const int API_ID_INVALID = 400;//Helper_OnError
+        public const int UNREGISTERED = -111;//custom code
     }
 
     /// <summary>

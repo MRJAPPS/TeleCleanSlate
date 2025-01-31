@@ -1,5 +1,6 @@
 ﻿//MRJ
 using TdLib;
+using TeleCleanSlate.Common;
 
 namespace TeleCleanSlate.Telegram.Security;
 
@@ -11,7 +12,7 @@ internal class AuthorizationHandler : IDisposable
     #region FIELDS
     #region PRIVATE
     #region CALLBACKS
-    private readonly Func<AuthorizationHandler, string> OnNeedFirstName, OnNeedLastName, OnNeedCode, OnNeedPassword;
+    private readonly Func<AuthorizationHandler, string> OnNeedCode, OnNeedPassword;
     private readonly Action<AuthorizationHandler>? OnReadyToUse;
     private readonly Action<AuthorizationHandler, Exception>? OnUnknownError;
     private readonly Action<AuthorizationHandler, TdException>? OnError;
@@ -159,8 +160,11 @@ internal class AuthorizationHandler : IDisposable
                 await AuthorizationStateWaitPasswordHandler();
                 break;
             case TdApi.AuthorizationState.AuthorizationStateWaitRegistration:
-                await AuthorizationStateWaitRegistrationHandler();
-                break;
+                throw new TdException(new TdApi.Error()
+                {
+                    Code = CommonConstants.TdErrorCodes.UNREGISTERED,
+                    Message = "The user is unregistered!"
+                });
             case TdApi.AuthorizationState.AuthorizationStateLoggingOut:
             case TdApi.AuthorizationState.AuthorizationStateClosing:
             case TdApi.AuthorizationState.AuthorizationStateClosed:
@@ -171,28 +175,6 @@ internal class AuthorizationHandler : IDisposable
                     OnReadyToUse?.Invoke(this);
                     break;
                 }
-        }
-    }
-    /// <summary>
-    /// Handles the state where the user needs to register by providing a first name and last name.
-    /// If an error occurs, the operation may be retried based on the <see cref="tryAgain"/> flag.
-    /// </summary>
-    private async Task AuthorizationStateWaitRegistrationHandler()
-    {
-        bool shouldRetry = true;
-        while (shouldRetry)
-        {
-            try
-            {
-                await client.RegisterUserAsync(OnNeedFirstName(this), OnNeedLastName(this));
-                break;
-            }
-            catch (Exception e)
-            {
-                if (e is TdException etd) OnError?.Invoke(this, etd);
-                else OnUnknownError?.Invoke(this, e);
-                shouldRetry = tryAgain;
-            }
         }
     }
     /// <summary>
@@ -352,7 +334,6 @@ internal class AuthorizationHandler : IDisposable
     /// <param name="tryAgain">Indicates whether to retry the authorization process in case of failure. Defaults to true.</param>
     public AuthorizationHandler(TdClient client, string dbLocation, string appVersion, string data,
                                 string apiHash, int apiId, string deviceName, string languageCode,
-                                Func<AuthorizationHandler, string> OnNeedFirstName, Func<AuthorizationHandler, string> OnNeedLastName,
                                 Func<AuthorizationHandler, string> OnNeedCode, Func<AuthorizationHandler, string> OnNeedPassword,
                                 Action<AuthorizationHandler, Exception>? OnUnknownError = null, Action<AuthorizationHandler, TdException>? OnError = null,
                                 Action<AuthorizationHandler>? OnReadyToUse = null,
@@ -373,8 +354,6 @@ internal class AuthorizationHandler : IDisposable
         this.OnReadyToUse = OnReadyToUse;
         this.OnNeedPassword = OnNeedPassword;
         this.OnNeedCode = OnNeedCode;
-        this.OnNeedLastName = OnNeedLastName;
-        this.OnNeedFirstName = OnNeedFirstName;
         client.UpdateReceived += Client_UpdateReceived;
     }
 }

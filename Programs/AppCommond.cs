@@ -23,7 +23,7 @@ namespace TeleCleanSlate.Programs
             client = new();
             client.Bindings.SetLogVerbosityLevel(TdLogLevel.Fatal);
             AuthorizationHandler helper = helper = new(client, settings.DbName, appVersion, settings.Tell, settings.ApiHash, settings.ApiId, settings.DeviceName, settings.LangCode
-           , Helper_OnNeedFirstName, Helper_OnNeedLastName, Helper_OnNeedCode, Helper_OnNeedPassword, Helper_OnUnknownError, Helper_OnError);
+           , Helper_OnNeedCode, Helper_OnNeedPassword, Helper_OnUnknownError, Helper_OnError);
             client.UpdateReceived += CommonUpdateHandlerMethods.UpdateChatListHanlder;
             client.UpdateReceived += CommonUpdateHandlerMethods.UpdateFoldersHandler;
             helper.Wait();

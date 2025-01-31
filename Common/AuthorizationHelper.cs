@@ -21,11 +21,7 @@ namespace TeleCleanSlate.Common
                 Environment.Exit(3);
         }
 
-        public static string Helper_OnNeedFirstName(object _) => AnsiConsole.Prompt(new TextPrompt<string>("Enter the FirstName: "));
-
         public static string Helper_OnNeedCode(object _) => AnsiConsole.Prompt(new TextPrompt<string>("Enter the Code: ").Secret());
-
-        public static string Helper_OnNeedLastName(object _) => AnsiConsole.Prompt(new TextPrompt<string>("Enter the LastName: "));
 
         public static string Helper_OnNeedPassword(object _) => AnsiConsole.Prompt(new TextPrompt<string>("Enter the password: ").Secret());
     }
