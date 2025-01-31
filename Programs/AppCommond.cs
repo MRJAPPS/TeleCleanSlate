@@ -19,11 +19,6 @@ namespace TeleCleanSlate.Programs
 
         public override int Execute(CommandContext context, Settings settings)
         {
-            try
-            {
-                File.Delete(settings.DbName);
-            }
-            catch { }
             settings.Tell = GetPhoneNumber(settings.Tell);
             client = new();
             client.Bindings.SetLogVerbosityLevel(TdLogLevel.Fatal);
