@@ -27,6 +27,10 @@ internal class CleanSlate(TdClient client)
         long meId = (await client.GetMeAsync()).Id;
         var keys = CommonData.MainChatList.Keys.ToArray();
         /*
+         * The progress display is not thread safe,
+         * and using it together with other interactive components such as prompts,
+         * status displays or other progress displays are not supported.
+         */
         await AnsiConsole.Progress().StartAsync(async ctx =>
         {
             var prog = ctx.AddTask("Scaning and removing chats...", maxValue: keys.Length);
@@ -97,8 +101,9 @@ internal class CleanSlate(TdClient client)
             }
         }
 #endif
-        AnsiConsole.MarkupLine("Apparently, your account has been deleted. We're sorry you made this decision, and we hope it wasn't to erase evidence of a crime! ([green]If it hasn't been deleted, you can use the standard method.[/])\n Bye!");
-        Environment.Exit(0);
+        Panel infoPanel = new Panel("Apparently, your account has been deleted. We're sorry you made this decision, and we hope it wasn't to erase evidence of a crime! ([green]If it hasn't been deleted, you can use the standard method.[/])").Header("[green bold rapidblink]INFO[/]");
+        AnsiConsole.Write(infoPanel);
+        AnsiConsole.WriteLine("Bye!");
     }
 }
 
