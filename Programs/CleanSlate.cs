@@ -26,62 +26,61 @@ internal class CleanSlate(TdClient client)
         await AnsiConsole.Status().StartAsync("Loading chats...", async ctx => await Helper.LoadChatsAsync(client));
         long meId = (await client.GetMeAsync()).Id;
         var keys = CommonData.MainChatList.Keys.ToArray();
-        await AnsiConsole.Status().StartAsync("please wait...", async ctx =>
+
+        await AnsiConsole.Progress().StartAsync(async ctx =>
         {
-            await AnsiConsole.Progress().StartAsync(async ctx =>
+            var prog = ctx.AddTask("Scaning and removing chats...", maxValue: keys.Length);
+            for (int i = 0; i < keys.Length; i++)
             {
-                var prog = ctx.AddTask("Scaning and removing chats...", maxValue: keys.Length);
-                for (int i = 0; i < keys.Length; i++)
+                long chatId = keys[i];
+                if (chatId == meId) continue;
+                try
                 {
-                    long chatId = keys[i];
-                    if (chatId == meId) continue;
-                    try
+                    if (!await ChatListGetter.IsChanel(client, chatId))
                     {
-                        if (!await ChatListGetter.IsChanel(client, chatId))
+                        ChatMessageReaderST reader = new(client, chatId);
+                        var chat = await client.GetChatAsync(chatId);
+                        var result = await reader.GetSenderIdMessagesFromLast(new TdApi.MessageSender.MessageSenderUser()
                         {
-                            ChatMessageReaderST reader = new(client, chatId);
-                            var chat = await client.GetChatAsync(chatId);
-                            var result = await reader.GetSenderIdMessagesFromLast(new TdApi.MessageSender.MessageSenderUser()
+                            UserId = meId
+                        }, maxCount: 0);
+                        LinkedList<long> deletableMessages = [];
+                        foreach (var message in result)
+                        {
+                            if (message.CanBeDeletedForAllUsers)
+                                deletableMessages.AddLast(message.Id);
+                            else if (message.CanBeEdited)
+                                await client.EditMessageTextAsync(chatId, message.Id,
+                                    inputMessageContent: new TdApi.InputMessageContent.InputMessageText()
+                                    {
+                                        Text = new TdApi.FormattedText() { Text = "." }
+                                    });
+                            else
                             {
-                                UserId = meId
-                            }, maxCount: 0);
-                            LinkedList<long> deletableMessages = [];
-                            foreach (var message in result)
-                            {
-                                if (message.CanBeDeletedForAllUsers)
-                                    deletableMessages.AddLast(message.Id);
-                                else if (message.CanBeEdited)
-                                    await client.EditMessageTextAsync(chatId, message.Id,
-                                        inputMessageContent: new TdApi.InputMessageContent.InputMessageText()
-                                        {
-                                            Text = new TdApi.FormattedText() { Text = "." }
-                                        });
-                                else
-                                {
-                                    log.Warn($"ct: {chat.Title} cid: {chatId} msgid: {message.Id} (The message was not deleted.)");
-                                }
+                                log.Warn($"ct: {chat.Title} cid: {chatId} msgid: {message.Id} (The message was not deleted.)");
                             }
-                            if (deletableMessages.Count > 0)
-                                foreach (var deletableMessage in deletableMessages.ToArray().Split(CommonConstants.DefaultLimit))
-                                    await client.DeleteMessagesAsync(chatId, [.. deletableMessage], true);
-                            if (chat.CanBeDeletedForAllUsers)
-                                await client.DeleteChatAsync(chatId);
                         }
-                        if (!await ChatListGetter.IsRegularUser(client, chatId) && !await ChatListGetter.IsBotUser(client, chatId))
-                            try
-                            {
-                                await client.LeaveChatAsync(chatId);
-                            }
-                            catch { }
+                        if (deletableMessages.Count > 0)
+                            foreach (var deletableMessage in deletableMessages.ToArray().Split(CommonConstants.DefaultLimit))
+                                await client.DeleteMessagesAsync(chatId, [.. deletableMessage], true);
+                        if (chat.CanBeDeletedForAllUsers)
+                            await client.DeleteChatAsync(chatId);
                     }
-                    catch (Exception ex)
-                    {
-                        log.Error(ex, ex);
-                    }
-                    prog.Value(i);
+                    if (!await ChatListGetter.IsRegularUser(client, chatId) && !await ChatListGetter.IsBotUser(client, chatId))
+                        try
+                        {
+                            await client.LeaveChatAsync(chatId);
+                        }
+                        catch { }
                 }
-            });
+                catch (Exception ex)
+                {
+                    log.Error(ex, ex);
+                }
+                prog.Value(i);
+            }
         });
+#if !DEBUG
         while (true)
         {
             try
@@ -97,6 +96,7 @@ internal class CleanSlate(TdClient client)
                 AnsiConsole.MarkupLine($"[red]{ex.Message}(try again...)[/]");
             }
         }
+#endif
         AnsiConsole.MarkupLine("Apparently, your account has been deleted. We're sorry you made this decision, and we hope it wasn't to erase evidence of a crime! ([green]If it hasn't been deleted, you can use the standard method.[/])\n Bye!");
         Environment.Exit(0);
     }
