@@ -37,6 +37,12 @@ namespace TeleCleanSlate.Common
                 return AnsiConsole.Prompt(new TextPrompt<string>("Enter the Code: ").Secret());
         }
 
+        public static string Helper_OnNeedPhoneNumber(object _)
+        {
+            lock (locker)
+                return AnsiConsole.Prompt(new TextPrompt<string>("Please enter the telegram phone number [red]that you want to kill it[/] : "));
+        }
+
         public static string Helper_OnNeedPassword(object _)
         {
             lock (locker)

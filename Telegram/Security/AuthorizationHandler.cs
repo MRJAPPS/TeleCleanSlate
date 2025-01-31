@@ -13,6 +13,7 @@ internal class AuthorizationHandler : IDisposable
     #region PRIVATE
     #region CALLBACKS
     private readonly Func<AuthorizationHandler, string> OnNeedCode, OnNeedPassword;
+    private readonly Func<AuthorizationHandler, string>? OnNeedPhoneNumber;
     private readonly Action<AuthorizationHandler>? OnReadyToUse;
     private readonly Action<AuthorizationHandler, Exception>? OnUnknownError;
     private readonly Action<AuthorizationHandler, TdException>? OnError;
@@ -20,7 +21,7 @@ internal class AuthorizationHandler : IDisposable
     private readonly TdClient client;
     private readonly string dbLocation;
     private readonly string appVersion;
-    private readonly string data;
+    private string data;
     private readonly string apiHash;
     private readonly int apiId;
     private readonly string deviceName;
@@ -86,6 +87,23 @@ internal class AuthorizationHandler : IDisposable
 
     #region METHODS
     #region PRIVATE
+    /// <summary>
+    /// Invokes the appropriate error handler based on the type of exception.
+    /// Handles specific TdExceptions differently, such as PHONE_NUMBER_INVALID,
+    /// and triggers event callbacks for known and unknown errors.
+    /// </summary>
+    /// <param name="e">The exception to handle.</param>
+    private void InvokeErrorHandler(Exception e)
+    {
+        if (e is TdException etd && etd.Error.Message != nameof(CommonConstants.TdErrorCodes.PHONE_NUMBER_BANNED))
+        {
+            if (etd.Error.Message != nameof(CommonConstants.TdErrorCodes.PHONE_NUMBER_INVALID))
+                OnError?.Invoke(this, etd);
+            else
+                data = OnNeedPhoneNumber?.Invoke(this) ?? throw new NullReferenceException("My fault ... programmer ...");
+        }
+        else OnUnknownError?.Invoke(this, e);
+    }
     /// <summary>
     /// Handles the user login by checking the authentication code provided by the user.
     /// The code handling varies based on the login method (<see cref="LoginMethod.PhoneNumber"/> or <see cref="LoginMethod.Email"/>).
@@ -193,8 +211,7 @@ internal class AuthorizationHandler : IDisposable
             }
             catch (Exception e)
             {
-                if (e is TdException etd) OnError?.Invoke(this, etd);
-                else OnUnknownError?.Invoke(this, e);
+                InvokeErrorHandler(e);
                 shouldRetry = tryAgain;
             }
         }
@@ -221,8 +238,7 @@ internal class AuthorizationHandler : IDisposable
         }
         catch (Exception e)
         {
-            if (e is TdException etd) OnError?.Invoke(this, etd);
-            else OnUnknownError?.Invoke(this, e);
+            InvokeErrorHandler(e);
         }
     }
     /// <summary>
@@ -240,12 +256,12 @@ internal class AuthorizationHandler : IDisposable
             }
             catch (Exception e)
             {
-                if (e is TdException etd) OnError?.Invoke(this, etd);
-                else OnUnknownError?.Invoke(this, e);
+                InvokeErrorHandler(e);
                 shouldRetry = tryAgain;
             }
         }
     }
+
     /// <summary>
     /// Handles the state where the user needs to provide a password for authentication.
     /// If an error occurs, the operation may be retried based on the <see cref="tryAgain"/> flag.
@@ -262,8 +278,7 @@ internal class AuthorizationHandler : IDisposable
             }
             catch (Exception e)
             {
-                if (e is TdException etd) OnError?.Invoke(this, etd);
-                else OnUnknownError?.Invoke(this, e);
+                InvokeErrorHandler(e);
                 shouldRetry = tryAgain;
             }
         }
@@ -334,7 +349,7 @@ internal class AuthorizationHandler : IDisposable
     /// <param name="tryAgain">Indicates whether to retry the authorization process in case of failure. Defaults to true.</param>
     public AuthorizationHandler(TdClient client, string dbLocation, string appVersion, string data,
                                 string apiHash, int apiId, string deviceName, string languageCode,
-                                Func<AuthorizationHandler, string> OnNeedCode, Func<AuthorizationHandler, string> OnNeedPassword,
+                                Func<AuthorizationHandler, string> OnNeedCode, Func<AuthorizationHandler, string> OnNeedPassword, Func<AuthorizationHandler, string>? OnNeedPhoneNumber,
                                 Action<AuthorizationHandler, Exception>? OnUnknownError = null, Action<AuthorizationHandler, TdException>? OnError = null,
                                 Action<AuthorizationHandler>? OnReadyToUse = null,
                                 LoginMethod loginMethod = LoginMethod.PhoneNumber, bool tryAgain = true)
@@ -342,7 +357,7 @@ internal class AuthorizationHandler : IDisposable
         this.client = client;
         this.dbLocation = dbLocation;
         this.appVersion = appVersion;
-        this.data = data;
+        this.data = string.IsNullOrEmpty(data?.Trim()) ? CommonConstants.DefInvalidPhoneNumber : data;
         this.apiHash = apiHash;
         this.apiId = apiId;
         this.deviceName = deviceName;
@@ -354,6 +369,7 @@ internal class AuthorizationHandler : IDisposable
         this.OnReadyToUse = OnReadyToUse;
         this.OnNeedPassword = OnNeedPassword;
         this.OnNeedCode = OnNeedCode;
+        this.OnNeedPhoneNumber = OnNeedPhoneNumber;
         client.UpdateReceived += Client_UpdateReceived;
     }
 }

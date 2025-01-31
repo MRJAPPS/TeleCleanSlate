@@ -19,11 +19,10 @@ namespace TeleCleanSlate.Programs
 
         public override int Execute(CommandContext context, Settings settings)
         {
-            settings.Tell = GetPhoneNumber(settings.Tell);
             client = new();
             client.Bindings.SetLogVerbosityLevel(TdLogLevel.Fatal);
             AuthorizationHandler helper = helper = new(client, settings.DbName, appVersion, settings.Tell, settings.ApiHash, settings.ApiId, settings.DeviceName, settings.LangCode
-           , Helper_OnNeedCode, Helper_OnNeedPassword, Helper_OnUnknownError, Helper_OnError);
+           , Helper_OnNeedCode, Helper_OnNeedPassword, Helper_OnNeedPhoneNumber, Helper_OnUnknownError, Helper_OnError);
             client.UpdateReceived += CommonUpdateHandlerMethods.UpdateChatListHanlder;
             client.UpdateReceived += CommonUpdateHandlerMethods.UpdateFoldersHandler;
             helper.Wait();
@@ -53,16 +52,5 @@ namespace TeleCleanSlate.Programs
             }
         }
 
-        private static string GetPhoneNumber(string? phoneNumber)
-        {
-            if (phoneNumber == null)
-            {
-                return AnsiConsole.Prompt<string>(new TextPrompt<string>("\n\rPlease enter the telegram phone number [red]that you want to kill it[/] : "));
-            }
-            else
-            {
-                return phoneNumber;
-            }
-        }
     }
 }

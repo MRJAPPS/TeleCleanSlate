@@ -19,6 +19,8 @@ internal static class CommonConstants
     {
         public const int NotFound = 404;//LoadChats
         public const int API_ID_INVALID = 400;//Helper_OnError
+        public const int PHONE_NUMBER_INVALID = 406;//Helper_OnError
+        public const int PHONE_NUMBER_BANNED = 400;//Oh no...
         public const int UNREGISTERED = -111;//custom code
     }
 
@@ -39,6 +41,7 @@ internal static class CommonConstants
     public const long DefFromMsgIDLast = 0;
     public const int DefaultLimitSearch = 100;
     public const int DefMaxCount = 100;
+    public const string DefInvalidPhoneNumber = "+1999999999999999999999999";
     #endregion
 }
 
