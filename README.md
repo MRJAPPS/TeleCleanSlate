@@ -87,13 +87,13 @@ dotnet (TeleCleanSlate.dll path) "12345abcd" 987654321 --phone "+1234567890"
 | `--devname` | Specify the device name (default: `PC`). |
 | `--lang` | Set the language code (default: `en`). |
 | `--phone` | Provide the target phone number for deletion. |
-| `-u|--SuperGroup` | If true, skips deletion of chats associated with supergroups. |
-| `-g|--BasicGroup` | If true, skips deletion of chats associated with basic groups. |
-| `-b|--BotUser` | If true, skips deletion of chats associated with bot users. |
-| `-c|--Chanel` | If true, skips deletion of chats associated with bot channels. |
-| `-r|--RegularUser` | If true, skips deletion of chats associated with bot regular users. |
-| `-k|--KeepSession` | If set to true, the current Telegram session will be preserved. This allows you to avoid logging in again every time you run the tool. If not set, the session will be cleared, requiring a fresh login on subsequent runs. |
-| `-j|--JustClean` | If set to true,  the tool will NOT use Telegram's standard account deletion method ([more info](https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1delete_account.html))|
+| `-u,--SuperGroup` | If true, skips deletion of chats associated with supergroups. |
+| `-g,--BasicGroup` | If true, skips deletion of chats associated with basic groups. |
+| `-b,--BotUser` | If true, skips deletion of chats associated with bot users. |
+| `-c,--Chanel` | If true, skips deletion of chats associated with bot channels. |
+| `-r,--RegularUser` | If true, skips deletion of chats associated with bot regular users. |
+| `-k,--KeepSession` | If set to true, the current Telegram session will be preserved. This allows you to avoid logging in again every time you run the tool. If not set, the session will be cleared, requiring a fresh login on subsequent runs. |
+| `-j,--JustClean` | If set to true,  the tool will NOT use Telegram's standard account deletion method ([more info](https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1delete_account.html))|
 
 ---
 
