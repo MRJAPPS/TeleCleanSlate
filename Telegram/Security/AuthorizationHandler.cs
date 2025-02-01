@@ -29,6 +29,7 @@ internal class AuthorizationHandler : IDisposable
     private readonly LoginMethod loginMethod;
     private readonly ManualResetEventSlim Ready = new();
     private readonly bool tryAgain;
+    private bool codeEntered = false;
     #endregion
     #endregion
 
@@ -252,7 +253,9 @@ internal class AuthorizationHandler : IDisposable
         {
             try
             {
-                await HandleUserLoginCode(OnNeedCode(this));
+                if (!codeEntered)
+                    await HandleUserLoginCode(OnNeedCode(this));
+                codeEntered = true;
             }
             catch (Exception e)
             {
