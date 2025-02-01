@@ -55,11 +55,15 @@ internal class CleanSlate(TdClient client)
             {
                 long chatId = keys[i];
                 if (chatId == meId ||
-                !await CheckChatCond(superGroup, chatId, ChatListGetter.IsSuperGroup) ||
-                !await CheckChatCond(basicGroup, chatId, ChatListGetter.IsBasicGroup) ||
-                !await CheckChatCond(botUser, chatId, ChatListGetter.IsBotUser) ||
-                !await CheckChatCond(chanel, chatId, ChatListGetter.IsChanel) ||
-                !await CheckChatCond(regularUser, chatId, ChatListGetter.IsRegularUser)) continue;
+                await CheckChatCond(!superGroup, chatId, ChatListGetter.IsSuperGroup) ||
+                await CheckChatCond(!basicGroup, chatId, ChatListGetter.IsBasicGroup) ||
+                await CheckChatCond(!botUser, chatId, ChatListGetter.IsBotUser) ||
+                await CheckChatCond(!chanel, chatId, ChatListGetter.IsChanel) ||
+                await CheckChatCond(!regularUser, chatId, ChatListGetter.IsRegularUser))
+                {
+                    prog.Value(i + 1);
+                    continue;
+                }
                 try
                 {
                     if (!await ChatListGetter.IsChanel(client, chatId))
